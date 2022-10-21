@@ -72,7 +72,7 @@ class MycroftFan:
         return out, err
 
     @staticmethod
-    def cToF(temp):
+    def celcius_to_fahrenheit(temp):
         return (temp * 1.8) + 32
 
 
@@ -179,6 +179,11 @@ class R10FanControl(MycroftFan):
 
 
 def get_fan(revision: SJ201) -> MycroftFan:
+    """
+    Get a MycroftFan object to handle temperature monitoring and fan controls
+    :param revision: SJ201 Board Revision
+    :returns: MycroftFan Object
+    """
     if revision == SJ201.r10:
         return R10FanControl()
     elif revision == SJ201.r6:

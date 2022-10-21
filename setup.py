@@ -68,7 +68,7 @@ setup(
     license='BSD-3',
     author='Neongecko',
     author_email='developers@neon.ai',
-    url='https://github.com/NeonGeckoCom/NeonCore',
+    url='https://github.com/NeonGeckoCom/sj201-interface',
     description='SJ201 Interface',
     long_description=long_description,
     long_description_content_type="text/markdown",

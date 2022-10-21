@@ -293,6 +293,11 @@ class R10Led(MycroftLed):
 
 
 def get_led(revision: SJ201) -> MycroftLed:
+    """
+    Get a MycroftLed object to handle LED controls
+    :param revision: SJ201 Board Revision
+    :returns: MycroftLed Object
+    """
     if revision == SJ201.r10:
         return R10Led()
     elif revision == SJ201.r6:

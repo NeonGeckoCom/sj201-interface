@@ -37,6 +37,9 @@ class SJ201(Enum):
 
 
 def detect_sj201_revision() -> Optional[SJ201]:
+    """
+    Detect which revision of SJ201 (if any) is connected.
+    """
     tiny_address = "04"
     xmos_address = "2c"
     ti_address = "2f"
