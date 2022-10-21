@@ -1,0 +1,5 @@
+RPi.GPIO
+smbus2
+ovos_utils
+board
+neopixel
