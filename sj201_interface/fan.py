@@ -30,7 +30,9 @@ import abc
 import subprocess
 import RPi.GPIO as GPIO
 
-from sj201_interface.revisions import SJ201
+from threading import Thread, Event
+from ovos_utils.log import LOG
+from sj201_interface.revisions import SJ201, detect_sj201_revision
 
 
 class MycroftFan:
@@ -50,9 +52,9 @@ class MycroftFan:
         """returns value between 0-100"""
 
     @abc.abstractmethod
-    def get_cpu_temp(self):
+    def get_cpu_temp(self) -> float:
         """returns temp in celsius"""
-        return
+        return -1.0
 
     @staticmethod
     def execute_cmd(cmd):
@@ -176,6 +178,37 @@ class R10FanControl(MycroftFan):
         cmd = ["cat", "/sys/class/thermal/thermal_zone0/temp"]
         out, err = self.execute_cmd(cmd)
         return float(out.strip()) / 1000
+
+
+class FanControlThread(Thread):
+    def __init__(self, fan_obj: MycroftFan = None):
+        self.fan_obj = fan_obj or get_fan(detect_sj201_revision())
+        self.exit_flag = Event()
+        self._max_fanless_temp = 60.0
+        Thread.__init__(self)
+
+    def run(self):
+        LOG.debug("temperature monitor thread started")
+        while not self.exit_flag.wait(30):
+            LOG.debug(f"CPU temperature is {self.fan_obj.get_cpu_temp()}")
+
+            current_temp = self.fan_obj.get_cpu_temp()
+            if current_temp < self._max_fanless_temp:
+                # Below specified fanless temperature
+                fan_speed = 0
+                LOG.debug(f"Temp below {self._max_fanless_temp}")
+            elif current_temp > 80.0:
+                LOG.warning(f"Thermal Throttling, temp={current_temp}C")
+                fan_speed = 100
+            else:
+                # Specify linear fan curve inside normal operating temp range
+                speed_const = 100/(80.0-self._max_fanless_temp)
+                fan_speed = speed_const * (current_temp -
+                                           self._max_fanless_temp)
+                LOG.debug(f"temp={current_temp}")
+
+            LOG.debug(f"Setting fan speed to: {fan_speed}")
+            self.fan_obj.set_fan_speed(fan_speed)
 
 
 def get_fan(revision: SJ201) -> MycroftFan:
