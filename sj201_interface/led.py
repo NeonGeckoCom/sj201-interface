@@ -47,7 +47,7 @@ import neopixel
 from ovos_utils.log import LOG
 from smbus2.smbus2 import SMBus, I2C_SMBUS_BLOCK_MAX
 
-from sj201_interface.revisions import SJ201
+from sj201_interface.revisions import SJ201, detect_sj201_revision
 
 
 class Palette:
@@ -75,7 +75,15 @@ class MycroftLed:
         return
 
     @abc.abstractmethod
-    def set_led(self, which_led, color, immediate):
+    @property
+    def num_leds(self) -> int:
+        """
+        Return the number of logical LED's available
+        """
+        return 0
+
+    @abc.abstractmethod
+    def set_led(self, which_led, color, immediate=True):
         """Set the color of a specific LED.
         Arguments:
          which_led (Int): the index of the LED to be changed
@@ -118,8 +126,8 @@ class MycroftLed:
 
 class R6Led(MycroftLed):
     real_num_leds = 12  # physical
-    num_leds = 12  # logical
-    black = (0, 0, 0)  # TODO pull from palette
+    _num_leds = 12  # logical
+    black = Palette.BLACK
     device_addr = 0x04
 
     def __init__(self):
@@ -133,6 +141,10 @@ class R6Led(MycroftLed):
                 range(self.num_leds, self.real_num_leds)
             ),
         }
+
+    @property
+    def num_leds(self):
+        return self._num_leds
 
     def adjust_brightness(self, cval, bval):
         return min(255, cval * bval)
@@ -226,8 +238,8 @@ class R6Led(MycroftLed):
 class R10Led(MycroftLed):
     led_type = 'new'
     real_num_leds = 12  # physical
-    num_leds = 10  # logical
-    black = (0, 0, 0)  # TODO pull from pallette
+    _num_leds = 12  # logical
+    black = Palette.BLACK
 
     def __init__(self):
         pixel_pin = board.D12
@@ -248,6 +260,10 @@ class R10Led(MycroftLed):
             "led_colors": "MycroftPalette",
             "reserved_leds": list(range(self.num_leds, self.real_num_leds)),
         }
+
+    @property
+    def num_leds(self):
+        return self._num_leds
 
     def adjust_brightness(self, cval, bval):
         return min(255, cval * bval)
@@ -304,3 +320,14 @@ def get_led(revision: SJ201) -> MycroftLed:
         return R6Led()
     else:
         raise ValueError(f"Unsupported revision: {revision}")
+
+
+def chase(led: MycroftLed = None, color: Palette = Palette.WHITE):
+    """
+    Display a color chase animation of the Mark2 LED Ring
+    :param led: MycroftLed object, else detect platform and create one
+    :param color: Palette color to chase
+    """
+    led = led or get_led(detect_sj201_revision())
+    for i in range(led.num_leds):
+        led.set_led(i, color)

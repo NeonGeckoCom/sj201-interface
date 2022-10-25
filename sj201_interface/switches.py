@@ -219,8 +219,7 @@ def get_switches(revision: SJ201) -> MycroftSwitch:
     :returns: MycroftSwitch Object
     """
     if revision == SJ201.r10:
-        raise NotImplementedError()
-        # return R10Switches()
+        return R6Switches()
     elif revision == SJ201.r6:
         return R6Switches()
     else:
