@@ -58,19 +58,19 @@ class MycroftSwitch:
         return
 
     @abc.abstractmethod
-    def handle_action(self):
+    def handle_action(self, *args):
         return
 
     @abc.abstractmethod
-    def handle_vol_down(self):
+    def handle_vol_down(self, *args):
         return
 
     @abc.abstractmethod
-    def handle_vol_up(self):
+    def handle_vol_up(self, *args):
         return
 
     @abc.abstractmethod
-    def handle_mute(self, val):
+    def handle_mute(self, *args):
         return
 
     @abc.abstractmethod
@@ -126,34 +126,28 @@ class R6Switches(MycroftSwitch):
         self.SW_VOL_DOWN = GPIO.input(self._SW_VOL_DOWN)
         self.SW_MUTE = GPIO.input(self._SW_MUTE)
 
-        # establish default handlers for each switch
-        self.action_handler = self.handle_action
-        self.vol_up_handler = self.handle_vol_up
-        self.vol_down_handler = self.handle_vol_down
-        self.mute_handler = self.handle_mute
-
         # attach callbacks
         GPIO.add_event_detect(self._SW_ACTION,
                               GPIO.BOTH,
-                              callback=self.action_handler,
+                              callback=self.handle_action,
                               bouncetime=debounce)
 
         GPIO.add_event_detect(self._SW_VOL_UP,
                               GPIO.BOTH,
-                              callback=self.vol_up_handler,
+                              callback=self.handle_vol_up,
                               bouncetime=debounce)
 
         GPIO.add_event_detect(self._SW_VOL_DOWN,
                               GPIO.BOTH,
-                              callback=self.vol_down_handler,
+                              callback=self.handle_vol_down,
                               bouncetime=debounce)
 
         GPIO.add_event_detect(self._SW_MUTE,
                               GPIO.BOTH,
-                              callback=self.mute_handler,
+                              callback=self.handle_mute,
                               bouncetime=debounce)
 
-        # user overides
+        # user overrides
         self.user_voldown_handler = None
         self.user_volup_handler = None
         self.user_action_handler = None
@@ -162,7 +156,7 @@ class R6Switches(MycroftSwitch):
     def get_capabilities(self):
         return self.capabilities
 
-    def handle_action(self):
+    def handle_action(self, channel):
         self.SW_ACTION = GPIO.input(self._SW_ACTION)
         if self.SW_ACTION == self.active:
             if self.user_action_handler is not None:
