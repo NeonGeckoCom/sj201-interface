@@ -62,11 +62,11 @@ class MycroftSwitch:
         return
 
     @abc.abstractmethod
-    def handle_voldown(self):
+    def handle_vol_down(self):
         return
 
     @abc.abstractmethod
-    def handle_volup(self):
+    def handle_vol_up(self):
         return
 
     @abc.abstractmethod
@@ -89,21 +89,11 @@ class R6Switches(MycroftSwitch):
     and interrupt driven. Also note switches are
     pulled up so the active state is actually zero.
     """
-    # GPIO pin numbers
-    """ old sj201 mappings
-    _SW_ACTION = 22
-    _SW_VOL_UP = 23
-    _SW_VOL_DOWN = 24
-    _SW_MUTE = 25
-    """
-    # sj201Rev4
+    # sj201R6 and R10
     _SW_VOL_UP = 22
     _SW_VOL_DOWN = 23
     _SW_ACTION = 24
     _SW_MUTE = 25
-
-    _XMOS_POWER = 16  # Enable1V
-    _XMOS_RESET = 27  # Reset XMOS
 
     def __init__(self, debounce=100):
         self.debounce = debounce
@@ -124,20 +114,7 @@ class R6Switches(MycroftSwitch):
         GPIO.setmode(GPIO.BCM)
         GPIO.setwarnings(False)
 
-        """
-        # xmos related
-        GPIO.setup(self._XMOS_POWER, GPIO.OUT)
-        GPIO.setup(self._XMOS_RESET, GPIO.OUT)
-
-        # power up the xmos
-        #self.reset_xmos()
-        time.sleep(0.001)
-        GPIO.output(self._XMOS_POWER, 1)
-        time.sleep(0.001)
-        GPIO.output(self._XMOS_RESET, 1)
-        """
-
-        # we need to pull up the 3 buttons
+        # we need to pull up the 3 buttons and mute switch
         GPIO.setup(self._SW_ACTION, GPIO.IN, pull_up_down=GPIO.PUD_UP)
         GPIO.setup(self._SW_VOL_UP, GPIO.IN, pull_up_down=GPIO.PUD_UP)
         GPIO.setup(self._SW_VOL_DOWN, GPIO.IN, pull_up_down=GPIO.PUD_UP)
@@ -210,6 +187,9 @@ class R6Switches(MycroftSwitch):
 
         if self.user_mute_handler is not None:
             self.user_mute_handler(self.SW_MUTE)
+
+    def terminate(self):
+        pass
 
 
 def get_switches(revision: SJ201) -> MycroftSwitch:

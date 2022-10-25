@@ -1,5 +1,5 @@
-RPi.GPIO
-smbus2
-ovos_utils
-board
-neopixel
+RPi.GPIO~=0.7
+smbus2~=0.4
+ovos_utils~=0.0.25
+board~=1.0
+neopixel~=0.0.1
