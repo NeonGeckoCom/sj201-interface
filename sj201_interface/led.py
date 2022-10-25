@@ -74,8 +74,8 @@ class MycroftLed:
     def __init__(self):
         return
 
-    @abc.abstractmethod
     @property
+    @abc.abstractmethod
     def num_leds(self) -> int:
         """
         Return the number of logical LED's available
