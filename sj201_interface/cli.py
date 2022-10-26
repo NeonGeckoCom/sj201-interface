@@ -51,7 +51,7 @@ def init_ti_amp():
 
 
 @sj201_cli.command(help="LED Reset Animation")
-@click.argument(help="Color of animation")
+@click.argument('color')
 def reset_led(color=None):
     from sj201_interface.led import Palette, reset_led_animation
     color = color or "green"
@@ -65,7 +65,7 @@ def reset_led(color=None):
 
 
 @sj201_cli.command(help="Set Fan Speed Percent")
-@click.argument(help="Fan Speed percent")
+@click.argument("speed")
 def set_fan_speed(speed=100):
     speed = int(round(speed))
     from sj201_interface.fan import get_fan
