@@ -20,3 +20,6 @@ Chase the specified color and then chase off LED ring. Valid colors are:
 
 ## `sj201 set-fan-speed <percent>`
 Set the fan speed to the specified speed as a percentage
+
+## `init-ti-amp`
+Perform one-time initialization of the TAS5806 Audio Amplifier
