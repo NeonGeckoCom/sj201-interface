@@ -63,13 +63,13 @@ class MycroftFan:
         out, err = process.communicate()
         try:
             out = out.decode("utf8")
-        except Exception:
-            pass
+        except Exception as e:
+            LOG.exception(e)
 
         try:
             err = err.decode("utf8")
-        except Exception:
-            pass
+        except Exception as e:
+            LOG.exception(e)
 
         return out, err
 

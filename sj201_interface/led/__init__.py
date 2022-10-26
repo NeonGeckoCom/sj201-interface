@@ -129,6 +129,10 @@ class MycroftLed:
         """returns capabilities object"""
         return
 
+    @staticmethod
+    def adjust_brightness(cval, bval):
+        return min(255, cval * bval)
+
 
 class R6Led(MycroftLed):
     real_num_leds = 12  # physical
@@ -151,9 +155,6 @@ class R6Led(MycroftLed):
     @property
     def num_leds(self):
         return self._num_leds
-
-    def adjust_brightness(self, cval, bval):
-        return min(255, cval * bval)
 
     def get_capabilities(self):
         return self.capabilities
@@ -250,7 +251,7 @@ class R10Led(MycroftLed):
 
     def __init__(self):
         pixel_pin = board.D12
-        ORDER = neopixel.GRB
+        order = neopixel.GRB
         self.brightness = 0.2
 
         self.pixels = neopixel.NeoPixel(
@@ -258,7 +259,7 @@ class R10Led(MycroftLed):
             self.real_num_leds,
             brightness=self.brightness,
             auto_write=False,
-            pixel_order=ORDER
+            pixel_order=order
         )
 
         self.capabilities = {
@@ -271,9 +272,6 @@ class R10Led(MycroftLed):
     @property
     def num_leds(self):
         return self._num_leds
-
-    def adjust_brightness(self, cval, bval):
-        return min(255, cval * bval)
 
     def get_capabilities(self):
         return self.capabilities
@@ -288,20 +286,24 @@ class R10Led(MycroftLed):
         self.pixels[pixel] = (red_val, green_val, blue_val)
 
     def _set_led_with_brightness(self, pixel, color, blevel):
-        self._set_led(pixel, list(map(self.adjust_brightness, color, (blevel,) * 3)))
+        self._set_led(pixel, list(map(self.adjust_brightness,
+                                      color, (blevel,) * 3)))
 
     def show(self):
         """show buffered leds, only used
         for older slower devices"""
         self.pixels.show()
 
-    def set_led(self, pixel, color):
+    def set_led(self, pixel, color, immediate=True):
         """external interface enforces led
         reservation and honors brightness"""
         self._set_led(
             pixel % self.num_leds,
             list(map(self.adjust_brightness, color, (self.brightness,) * 3)),
         )
+
+    def get_led(self, which_led):
+        pass
 
     def fill(self, color: Union[Palette, tuple]):
         """fill all leds with the same color"""
@@ -362,16 +364,16 @@ class LedThread(Thread):
                         while self.animation_running and current_animation.step(
                                 context=self._context
                         ):
-                            time.sleep(0)
+                            sleep(0)
                         current_animation.stop()
-                    except Exception:
+                    except Exception as e:
                         self.led_obj.fill(self.led_obj.black)
-                        LOG.exception("error running animation '%s'", name)
+                        LOG.exception(f"error running animation '{name}': {e}")
 
                 else:
-                    LOG.error("No animation named %s", name)
-        except Exception:
-            LOG.exception("error running led animation")
+                    LOG.error(f"No animation named {name}")
+        except Exception as e:
+            LOG.exception(f"error running led animation: {e}")
 
 
 def get_led(revision: SJ201) -> MycroftLed:
