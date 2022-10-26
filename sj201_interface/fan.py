@@ -88,7 +88,7 @@ class R6FanControl(MycroftFan):
 
     def __init__(self):
         self.fan_speed = 0
-        self.set_fan_speed(self.fan_speed)
+        # self.set_fan_speed(self.fan_speed)
 
     def speed_to_hdw_val(self, speed):
         out_steps = self.HDW_MAX - self.HDW_MIN
@@ -124,6 +124,8 @@ class R6FanControl(MycroftFan):
         hdw_speed = str(hdw_speed)
         cmd = ["i2cset", "-y", "1", "0x04", "101", hdw_speed, "i"]
         out, err = self.execute_cmd(cmd)
+        LOG.debug(f'out={out}')
+        LOG.debug(f'err={err}')
 
     def set_fan_speed(self, speed):
         self.fan_speed = self.speed_to_hdw_val(speed)

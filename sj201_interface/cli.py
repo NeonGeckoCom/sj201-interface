@@ -67,7 +67,7 @@ def reset_led(color=None):
 @sj201_cli.command(help="Set Fan Speed Percent")
 @click.argument("speed")
 def set_fan_speed(speed=100):
-    speed = int(round(speed))
+    speed = int(round(float(speed)))
     from sj201_interface.fan import get_fan
     from sj201_interface.revisions import detect_sj201_revision
     get_fan(detect_sj201_revision()).set_fan_speed(speed)
