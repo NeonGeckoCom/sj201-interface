@@ -41,11 +41,14 @@
 # SOFTWARE,  EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import abc
+
 import board
 import neopixel
 
 from enum import Enum
 from time import sleep
+from threading import Thread, Event
+from queue import Queue
 from ovos_utils.log import LOG
 from smbus2.smbus2 import SMBus, I2C_SMBUS_BLOCK_MAX
 
@@ -308,6 +311,63 @@ class R10Led(MycroftLed):
         """set leds from tuple array"""
         for x in range(0, self.num_leds):
             self.set_led(x, new_leds[x])
+
+
+class LedThread(Thread):
+    def __init__(self, led_obj, animations=None):
+        self.led_obj = led_obj
+        self.exit_flag = Event()
+        self.animations = animations or {}
+        self.queue = Queue()
+        self.animation_running = False
+        self.animation_name = None
+        self._context: {}
+
+        super().__init__()
+
+    def start_animation(self, name: str):
+        self.stop_animation()
+        self.queue.put(name)
+
+    def stop_animation(self, name=None):
+        if name and (self.animation_name != name):
+            # Different animation is playing
+            return
+
+        self.animation_running = False
+
+    @property
+    def context(self):
+        return self._context
+
+    def run(self):
+        try:
+            while not self.exit_flag.wait(30):
+                self.animation_name = None
+                self.animation_running = False
+
+                name = self.queue.get()
+                current_animation = self.animations.get(name)
+
+                if current_animation is not None:
+                    try:
+                        self._context = {}
+                        self.animation_name = name
+                        self.animation_running = True
+                        current_animation.start()
+                        while self.animation_running and current_animation.step(
+                                context=self._context
+                        ):
+                            time.sleep(0)
+                        current_animation.stop()
+                    except Exception:
+                        self.led_obj.fill(self.led_obj.black)
+                        LOG.exception("error running animation '%s'", name)
+
+                else:
+                    LOG.error("No animation named %s", name)
+        except Exception:
+            LOG.exception("error running led animation")
 
 
 def get_led(revision: SJ201) -> MycroftLed:
