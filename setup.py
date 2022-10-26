@@ -32,7 +32,7 @@ from os import path, getenv
 BASEDIR = path.abspath(path.dirname(__file__))
 
 
-with open("./version.py", "r", encoding="utf-8") as v:
+with open("./sj201_interface/version.py", "r", encoding="utf-8") as v:
     for line in v.readlines():
         if line.startswith("__version__"):
             if '"' in line:
@@ -75,4 +75,9 @@ setup(
     install_requires=get_requirements('requirements.txt'),
     packages=find_packages(),
     include_package_data=True,
+    entry_points={
+        'console_scripts': [
+            'sj201=sj201_interface.cli:sj201_cli'
+        ]
+    }
 )

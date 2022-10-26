@@ -26,29 +26,49 @@
 # NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE,  EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-import fileinput
-from os.path import join, dirname
+import click
 
-with open(join(dirname(__file__), "sj201_interface", "version.py"), "r", encoding="utf-8") as v:
-    for line in v.readlines():
-        if line.startswith("__version__"):
-            if '"' in line:
-                version = line.split('"')[1]
-            else:
-                version = line.split("'")[1]
+from click_default_group import DefaultGroup
 
-if "a" not in version:
-    parts = version.split('.')
-    parts[-1] = str(int(parts[-1]) + 1)
-    version = '.'.join(parts)
-    version = f"{version}a0"
-else:
-    post = version.split("a")[1]
-    new_post = int(post) + 1
-    version = version.replace(f"a{post}", f"a{new_post}")
 
-for line in fileinput.input(join(dirname(__file__), "version.py"), inplace=True):
-    if line.startswith("__version__"):
-        print(f"__version__ = \"{version}\"")
-    else:
-        print(line.rstrip('\n'))
+@click.group("sj201", cls=DefaultGroup,
+             no_args_is_help=True, invoke_without_command=True,
+             help="SJ201 Commands\n\n"
+                  "See also: sj201 COMMAND --help")
+@click.option("--version", "-v", is_flag=True, required=False,
+              help="Print the current version")
+def sj201_cli(version: bool = False):
+    if version:
+        from sj201_interface.version import __version__
+        click.echo(f"Neon version {__version__}")
+
+
+@sj201_cli.command(help="Initialize TAS5806")
+def init_ti_amp():
+    from sj201_interface.util.tas5806 import init_tas5806
+    init_tas5806()
+    click.echo("TI Amp Initialized")
+
+
+@sj201_cli.command(help="LED Reset Animation")
+@click.argument(help="Color of animation")
+def reset_led(color=None):
+    from sj201_interface.led import Palette, reset_led_animation
+    color = color or "green"
+    for col in Palette:
+        if col.name.lower() == color.lower():
+            color = col
+            break
+    if not isinstance(color, Palette):
+        color = None
+    reset_led_animation(color)
+
+
+@sj201_cli.command(help="Set Fan Speed Percent")
+@click.argument(help="Fan Speed percent")
+def set_fan_speed(speed=100):
+    speed = int(round(speed))
+    from sj201_interface.fan import get_fan
+    from sj201_interface.revisions import detect_sj201_revision
+    get_fan(detect_sj201_revision()).set_fan_speed(speed)
+    click.echo(f"Set fan speed to {speed}")

@@ -44,13 +44,15 @@ import abc
 import board
 import neopixel
 
+from enum import Enum
+from time import sleep
 from ovos_utils.log import LOG
 from smbus2.smbus2 import SMBus, I2C_SMBUS_BLOCK_MAX
 
 from sj201_interface.revisions import SJ201, detect_sj201_revision
 
 
-class Palette:
+class Palette(Enum):
     BLACK = (0, 0, 0)
     WHITE = (255, 255, 255)
     YELLOW = (255, 255, 0)
@@ -331,3 +333,14 @@ def chase(led: MycroftLed = None, color: Palette = Palette.WHITE):
     led = led or get_led(detect_sj201_revision())
     for i in range(led.num_leds):
         led.set_led(i, color)
+
+
+def reset_led_animation(color: Palette = Palette.WHITE):
+    """
+    Show a chase animation to fill and then clear the LEDs
+    :param color: Fill color
+    """
+    led_object = get_led(detect_sj201_revision())
+    chase(led_object, color)
+    sleep(1)
+    chase(led_object, Palette.BLACK)
