@@ -41,6 +41,7 @@
 # SOFTWARE,  EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import abc
+from typing import Union
 
 import board
 import neopixel
@@ -207,9 +208,10 @@ class R6Led(MycroftLed):
     def get_led(self, which_led):
         pass
 
-    def fill(self, color):
+    def fill(self, color: Union[tuple, Palette]):
         """fill all leds with the same color"""
-
+        if isinstance(color, Palette):
+            color = color.value
         rgb = [int(self.adjust_brightness(c, self.brightness))
                for c in color[:3]]
         try:
@@ -301,8 +303,10 @@ class R10Led(MycroftLed):
             list(map(self.adjust_brightness, color, (self.brightness,) * 3)),
         )
 
-    def fill(self, color):
+    def fill(self, color: Union[Palette, tuple]):
         """fill all leds with the same color"""
+        if isinstance(color, Palette):
+            color = color.value
         rgb = [int(self.adjust_brightness(c, self.brightness)) for c in color[:3]]
         self.pixels.fill(rgb)
         self.pixels.show()
