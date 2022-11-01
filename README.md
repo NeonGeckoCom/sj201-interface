@@ -19,7 +19,10 @@ Chase the specified color and then chase off LED ring. Valid colors are:
 - mycroft_blue
 
 ## `sj201 set-fan-speed <percent>`
-Set the fan speed to the specified speed as a percentage
+Set the fan speed to the specified speed as a percentage.
+>*NOTE*: On the SJ201R10, changing the fan speed is currently not persistent and
+> the fan will default to 100%. This command should only be used for validating
+> that the fan changes to the set value momentarily.
 
 ## `init-ti-amp`
 Perform one-time initialization of the TAS5806 Audio Amplifier

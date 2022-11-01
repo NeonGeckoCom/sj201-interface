@@ -157,7 +157,6 @@ class R10FanControl(MycroftFan):
         GPIO.setup(ledpin, GPIO.OUT)  # set direction
         self.pi_pwm = GPIO.PWM(ledpin, 1000)  # create PWM instance with frequency
         self.pi_pwm.start(0)  # start PWM of required Duty Cycle
-        # self.set_fan_speed(self.fan_speed)
 
     @staticmethod
     def speed_to_hdw_val(speed):
