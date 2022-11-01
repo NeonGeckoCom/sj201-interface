@@ -250,16 +250,15 @@ class R10Led(MycroftLed):
     black = Palette.BLACK
 
     def __init__(self):
-        pixel_pin = board.D12
-        order = neopixel.GRB
+        # pixel_pin = board.D12
+        # order = neopixel.GRB
         self.brightness = 0.2
-
         self.pixels = neopixel.NeoPixel(
-            pixel_pin,
+            board.D12,
             self.real_num_leds,
             brightness=self.brightness,
             auto_write=False,
-            pixel_order=order
+            pixel_order=neopixel.GRB
         )
 
         self.capabilities = {
@@ -297,10 +296,14 @@ class R10Led(MycroftLed):
     def set_led(self, pixel, color, immediate=True):
         """external interface enforces led
         reservation and honors brightness"""
+        LOG.debug(f"setting {pixel} to {color}")
         self._set_led(
             pixel % self.num_leds,
             list(map(self.adjust_brightness, color, (self.brightness,) * 3)),
         )
+        if immediate:
+            self.pixels.show()
+        LOG.debug(f"set {pixel} to {color}")
 
     def get_led(self, which_led):
         pass
@@ -399,6 +402,7 @@ def chase(led: MycroftLed = None, color: Palette = Palette.WHITE):
     led = led or get_led(detect_sj201_revision())
     for i in range(led.num_leds):
         led.set_led(i, color.value)
+        sleep(0.02)
 
 
 def reset_led_animation(color: Palette = Palette.WHITE):

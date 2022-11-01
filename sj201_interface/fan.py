@@ -30,6 +30,7 @@ import abc
 import subprocess
 import RPi.GPIO as GPIO
 
+from time import sleep
 from threading import Thread, Event
 from ovos_utils.log import LOG
 from sj201_interface.revisions import SJ201, detect_sj201_revision
@@ -150,13 +151,12 @@ class R10FanControl(MycroftFan):
 
     def __init__(self):
         self.fan_speed = 0
-        ledpin = 13  # PWM pin connected to LED
+        ledpin = 13  # PWM pin connected to Fan
         GPIO.setwarnings(False)  # disable warnings
         GPIO.setmode(GPIO.BCM)  # set pin numbering system
         GPIO.setup(ledpin, GPIO.OUT)  # set direction
         self.pi_pwm = GPIO.PWM(ledpin, 1000)  # create PWM instance with frequency
         self.pi_pwm.start(0)  # start PWM of required Duty Cycle
-        self.set_fan_speed(self.fan_speed)
 
     @staticmethod
     def speed_to_hdw_val(speed):
@@ -167,7 +167,9 @@ class R10FanControl(MycroftFan):
         return abs(float(hdw_val - 100.0))
 
     def hdw_set_speed(self, hdw_speed):
+        LOG.debug(f'Setting Fan Duty Cycle to {hdw_speed}')
         self.pi_pwm.ChangeDutyCycle(hdw_speed)  # provide duty cycle in the range 0-100
+        sleep(1)  # Block while fan ramps up/down
 
     def set_fan_speed(self, speed):
         self.fan_speed = self.speed_to_hdw_val(speed)
