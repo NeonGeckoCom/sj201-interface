@@ -253,7 +253,6 @@ class R10Led(MycroftLed):
         # pixel_pin = board.D12
         # order = neopixel.GRB
         self.brightness = 0.2
-
         self.pixels = neopixel.NeoPixel(
             board.D12,
             self.real_num_leds,

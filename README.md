@@ -17,6 +17,7 @@ Chase the specified color and then chase off LED ring. Valid colors are:
 - mycroft_red
 - mycroft_green
 - mycroft_blue
+>*NOTE*: On the SJ201R10, this command must be run as root
 
 ## `sj201 set-fan-speed <percent>`
 Set the fan speed to the specified speed as a percentage.
