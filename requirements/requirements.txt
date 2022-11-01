@@ -6,3 +6,4 @@ click~=8.0
 click-default-group~=1.2
 rpi_ws281x~=4.3
 adafruit-circuitpython-neopixel~=6.3
+adafruit-blinka~=8.6
