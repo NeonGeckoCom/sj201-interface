@@ -32,7 +32,7 @@ jobs:
           requirements: 'requirements-all.txt'
           fail: 'Copyleft,Other,Error'
           fails-only: true
-          exclude: '^(tqdm).*|^(sj201-interface).*'
+          exclude: '^(tqdm).*|^(sj201-interface).*|^(smbus).*'
           exclude-license: '^(Mozilla).*$|^(NeonAI License).*$'
       - name: Print report
         if: ${{ always() }}
