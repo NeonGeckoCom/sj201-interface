@@ -1,17 +1,3 @@
-# Copyright 2020 Mycroft AI Inc.
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#    http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-
 # NEON AI (TM) SOFTWARE, Software Development Kit & Application Framework
 # All trademark and other rights reserved by their respective owners
 # Copyright 2008-2022 Neongecko.com Inc.
@@ -40,98 +26,20 @@
 # NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE,  EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-import abc
 from typing import Union
 
 import board
 import neopixel
 
-from enum import Enum
 from time import sleep
 from threading import Thread, Event
 from queue import Queue
 from ovos_utils.log import LOG
 from smbus2.smbus2 import SMBus, I2C_SMBUS_BLOCK_MAX
 
+from abstract_hardware_interface.led import Color as Palette
+from abstract_hardware_interface.led import AbstractLed as MycroftLed
 from sj201_interface.revisions import SJ201, detect_sj201_revision
-
-
-class Palette(Enum):
-    BLACK = (0, 0, 0)
-    WHITE = (255, 255, 255)
-    YELLOW = (255, 255, 0)
-    RED = (255, 0, 0)
-    GREEN = (0, 255, 0)
-    BLUE = (0, 0, 255)
-    MAGENTA = (255, 0, 255)
-    BURNT_ORANGE = (173, 64, 0)
-    MYCROFT_RED = (216, 17, 89)
-    MYCROFT_GREEN = (64, 219, 176)
-    MYCROFT_BLUE = (34, 167, 240)
-
-
-class MycroftLed:
-    """abstract base class for a Mycroft Led
-    all leds must provide at least these basic methods"""
-
-    __metaclass__ = abc.ABCMeta
-
-    @abc.abstractmethod
-    def __init__(self):
-        return
-
-    @property
-    @abc.abstractmethod
-    def num_leds(self) -> int:
-        """
-        Return the number of logical LED's available
-        """
-        return 0
-
-    @abc.abstractmethod
-    def set_led(self, which_led, color, immediate=True):
-        """Set the color of a specific LED.
-        Arguments:
-         which_led (Int): the index of the LED to be changed
-         color (Tuple): the RGB color as a three integer Tuple
-         immediate (Bool): whether to change now or wait for the next call of show()
-        """
-        return
-
-    @abc.abstractmethod
-    def fill(self, color):
-        """set all leds to the supplied color
-        Arguments:
-         color (Tuple): the RGB color as a three integer Tuple
-        """
-        return
-
-    @abc.abstractmethod
-    def show(self):
-        """update leds from buffered data"""
-        return
-
-    @abc.abstractmethod
-    def get_led(self, which_led):
-        """returns current buffered value"""
-        return
-
-    @abc.abstractmethod
-    def set_leds(self, leds):
-        """updates buffer from leds and update hardware
-        Arguments:
-         leds [(of tuples),()]: the RGB color as a three integer Tuple
-        """
-        return
-
-    @abc.abstractmethod
-    def get_capabilities(self):
-        """returns capabilities object"""
-        return
-
-    @staticmethod
-    def adjust_brightness(cval, bval):
-        return min(255, cval * bval)
 
 
 class R6Led(MycroftLed):
@@ -143,7 +51,10 @@ class R6Led(MycroftLed):
     def __init__(self):
         self.bus = SMBus(1)
         self.brightness = 0.5
-        self.capabilities = {
+
+    @property
+    def capabilities(self) -> dict:
+        return {
             "num_leds": self.num_leds,
             "brightness": "(0.0-1.0)",
             "led_colors": "MycroftPalette",
@@ -186,7 +97,7 @@ class R6Led(MycroftLed):
             pixel,
             list(
                 map(
-                    self.adjust_brightness,
+                    self.scale_brightness,
                     color,
                     (blevel,) * 3)))
 
@@ -202,7 +113,7 @@ class R6Led(MycroftLed):
             pixel % self.num_leds,
             list(
                 map(
-                    self.adjust_brightness,
+                    self.scale_brightness,
                     color,
                     (self.brightness,) * 3)))
 
@@ -213,7 +124,7 @@ class R6Led(MycroftLed):
         """fill all leds with the same color"""
         if isinstance(color, Palette):
             color = color.value
-        rgb = [int(self.adjust_brightness(c, self.brightness))
+        rgb = [int(self.scale_brightness(c, self.brightness))
                for c in color[:3]]
         try:
             # Each element in rgb is a 3 byte tuple
@@ -242,6 +153,9 @@ class R6Led(MycroftLed):
         for x in range(0, self.num_leds):
             self.set_led(x, new_leds[x])
 
+    def shutdown(self):
+        self.fill(Palette.BLACK)
+
 
 class R10Led(MycroftLed):
     led_type = 'new'
@@ -261,7 +175,9 @@ class R10Led(MycroftLed):
             pixel_order=neopixel.GRB
         )
 
-        self.capabilities = {
+    @property
+    def capabilities(self) -> dict:
+        return {
             "num_leds": self.num_leds,
             "brightness": "(0.0-1.0)",
             "led_colors": "MycroftPalette",
@@ -285,7 +201,7 @@ class R10Led(MycroftLed):
         self.pixels[pixel] = (red_val, green_val, blue_val)
 
     def _set_led_with_brightness(self, pixel, color, blevel):
-        self._set_led(pixel, list(map(self.adjust_brightness,
+        self._set_led(pixel, list(map(self.scale_brightness,
                                       color, (blevel,) * 3)))
 
     def show(self):
@@ -299,7 +215,7 @@ class R10Led(MycroftLed):
         LOG.debug(f"setting {pixel} to {color}")
         self._set_led(
             pixel % self.num_leds,
-            list(map(self.adjust_brightness, color, (self.brightness,) * 3)),
+            list(map(self.scale_brightness, color, (self.brightness,) * 3)),
         )
         if immediate:
             self.pixels.show()
@@ -312,7 +228,8 @@ class R10Led(MycroftLed):
         """fill all leds with the same color"""
         if isinstance(color, Palette):
             color = color.value
-        rgb = [int(self.adjust_brightness(c, self.brightness)) for c in color[:3]]
+        rgb = tuple([int(self.scale_brightness(c, self.brightness))
+                     for c in color])
         self.pixels.fill(rgb)
         self.pixels.show()
 
@@ -320,6 +237,9 @@ class R10Led(MycroftLed):
         """set leds from tuple array"""
         for x in range(0, self.num_leds):
             self.set_led(x, new_leds[x])
+
+    def shutdown(self):
+        self.fill(Palette.BLACK)
 
 
 class LedThread(Thread):
@@ -335,10 +255,16 @@ class LedThread(Thread):
         super().__init__()
 
     def start_animation(self, name: str):
+        """
+        Stop any running animation and start the specified animation now.
+        """
         self.stop_animation()
         self.queue.put(name)
 
     def stop_animation(self, name=None):
+        """
+        Stop the specified animation if it is running
+        """
         if name and (self.animation_name != name):
             # Different animation is playing
             return
