@@ -26,7 +26,6 @@
 # NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE,  EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-import abc
 import subprocess
 import RPi.GPIO as GPIO
 
@@ -34,49 +33,24 @@ from time import sleep
 from threading import Thread, Event
 from ovos_utils.log import LOG
 from sj201_interface.revisions import SJ201, detect_sj201_revision
+from abstract_hardware_interface.fan import AbstractFan as MycroftFan
 
 
-class MycroftFan:
-    """ abstract base class for a Mycroft Fan
-     all fan classes must provide at least
-     these basic methods """
-    __metaclass__ = abc.ABCMeta
+def execute_cmd(cmd):
+    process = subprocess.Popen(cmd, stdout=subprocess.PIPE,
+                               stderr=subprocess.PIPE, )
+    out, err = process.communicate()
+    try:
+        out = out.decode("utf8")
+    except Exception as e:
+        LOG.exception(e)
 
-    @abc.abstractmethod
-    def set_fan_speed(self, new_speed):
-        """takes in value between 0 - 100
-           converts to internal format"""
-        return
+    try:
+        err = err.decode("utf8")
+    except Exception as e:
+        LOG.exception(e)
 
-    @abc.abstractmethod
-    def get_fan_speed(self):
-        """returns value between 0-100"""
-
-    @abc.abstractmethod
-    def get_cpu_temp(self) -> float:
-        """returns temp in celsius"""
-        return -1.0
-
-    @staticmethod
-    def execute_cmd(cmd):
-        process = subprocess.Popen(cmd, stdout=subprocess.PIPE,
-                                   stderr=subprocess.PIPE, )
-        out, err = process.communicate()
-        try:
-            out = out.decode("utf8")
-        except Exception as e:
-            LOG.exception(e)
-
-        try:
-            err = err.decode("utf8")
-        except Exception as e:
-            LOG.exception(e)
-
-        return out, err
-
-    @staticmethod
-    def celcius_to_fahrenheit(temp):
-        return (temp * 1.8) + 32
+    return out, err
 
 
 class R6FanControl(MycroftFan):
@@ -124,7 +98,7 @@ class R6FanControl(MycroftFan):
 
         hdw_speed = str(hdw_speed)
         cmd = ["i2cset", "-a", "-y", "1", "0x04", "101", hdw_speed, "i"]
-        out, err = self.execute_cmd(cmd)
+        out, err = execute_cmd(cmd)
         LOG.debug(f'out={out}')
         LOG.debug(f'err={err}')
 
@@ -137,8 +111,11 @@ class R6FanControl(MycroftFan):
 
     def get_cpu_temp(self):
         cmd = ["cat", "/sys/class/thermal/thermal_zone0/temp"]
-        out, err = self.execute_cmd(cmd)
+        out, err = execute_cmd(cmd)
         return float(out.strip()) / 1000
+
+    def shutdown(self):
+        self.set_fan_speed(25)
 
 
 class R10FanControl(MycroftFan):
@@ -180,8 +157,11 @@ class R10FanControl(MycroftFan):
 
     def get_cpu_temp(self):
         cmd = ["cat", "/sys/class/thermal/thermal_zone0/temp"]
-        out, err = self.execute_cmd(cmd)
+        out, err = execute_cmd(cmd)
         return float(out.strip()) / 1000
+
+    def shutdown(self):
+        self.set_fan_speed(25)
 
 
 class FanControlThread(Thread):

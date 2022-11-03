@@ -40,42 +40,12 @@
 # NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE,  EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-import abc
 import RPi.GPIO as GPIO
 import time
 
+from abstract_hardware_interface.switches import AbstractSwitches as MycroftSwitch
+
 from sj201_interface.revisions import SJ201
-
-
-class MycroftSwitch:
-    """ abstract base class for a Mycroft Switch Array
-     all switches must provide at least these basic methods """
-    __metaclass__ = abc.ABCMeta
-
-    @abc.abstractmethod
-    def terminate(self):
-        """terminates any underlying threads"""
-        return
-
-    @abc.abstractmethod
-    def handle_action(self, *args):
-        return
-
-    @abc.abstractmethod
-    def handle_vol_down(self, *args):
-        return
-
-    @abc.abstractmethod
-    def handle_vol_up(self, *args):
-        return
-
-    @abc.abstractmethod
-    def handle_mute(self, *args):
-        return
-
-    @abc.abstractmethod
-    def get_capabilities(self):
-        return
 
 
 class R6Switches(MycroftSwitch):
@@ -102,13 +72,6 @@ class R6Switches(MycroftSwitch):
         # some switch implementations require a thread
         # we don't but we must meet the base requirement
         self.thread_handle = None
-
-        self.capabilities = {
-            "user_volup_handler": "button",
-            "user_voldown_handler": "button",
-            "user_action_handler": "button",
-            "user_mute_handler": "slider"
-        }
 
         # use BCM GPIO pin numbering
         GPIO.setmode(GPIO.BCM)
@@ -153,36 +116,60 @@ class R6Switches(MycroftSwitch):
         self.user_action_handler = None
         self.user_mute_handler = None
 
-    def get_capabilities(self):
-        return self.capabilities
+    def on_action(self):
+        if self.user_action_handler:
+            self.user_action_handler()
+
+    def on_vol_up(self):
+        if self.user_volup_handler:
+            self.user_volup_handler()
+
+    def on_vol_down(self):
+        if self.user_voldown_handler:
+            self.user_voldown_handler()
+
+    def on_mute(self):
+        if self.user_mute_handler:
+            self.user_mute_handler(1)
+
+    def on_unmute(self):
+        if self.user_mute_handler:
+            self.user_mute_handler(0)
+
+    @property
+    def capabilities(self) -> dict:
+        return {
+            "user_volup_handler": "button",
+            "user_voldown_handler": "button",
+            "user_action_handler": "button",
+            "user_mute_handler": "slider"
+        }
 
     def handle_action(self, channel):
         self.SW_ACTION = GPIO.input(self._SW_ACTION)
         if self.SW_ACTION == self.active:
-            if self.user_action_handler is not None:
-                self.user_action_handler()
+            self.on_action()
 
     def handle_vol_up(self, channel):
         self.SW_VOL_UP = GPIO.input(self._SW_VOL_UP)
         if self.SW_VOL_UP == self.active:
-            if self.user_volup_handler is not None:
-                self.user_volup_handler()
+            self.on_vol_up()
 
     def handle_vol_down(self, channel):
         self.SW_VOL_DOWN = GPIO.input(self._SW_VOL_DOWN)
         if self.SW_VOL_DOWN == self.active:
-            if self.user_voldown_handler is not None:
-                self.user_voldown_handler()
+            self.on_vol_down()
 
     def handle_mute(self, channel):
         # No idea why this delay is necessary, but it makes the muting reliable
         time.sleep(0.05)
         self.SW_MUTE = GPIO.input(self._SW_MUTE)
+        if self.SW_MUTE == 1:
+            self.on_mute()
+        elif self.SW_MUTE == 0:
+            self.on_unmute()
 
-        if self.user_mute_handler is not None:
-            self.user_mute_handler(self.SW_MUTE)
-
-    def terminate(self):
+    def shutdown(self):
         pass
 
 
