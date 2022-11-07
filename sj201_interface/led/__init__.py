@@ -308,11 +308,10 @@ class R10Led(MycroftLed):
     def get_led(self, which_led):
         pass
 
-    def fill(self, color: Union[Palette, tuple]):
+    def fill(self, color: tuple):
         """fill all leds with the same color"""
-        if isinstance(color, Palette):
-            color = color.value
-        rgb = [int(self.adjust_brightness(c, self.brightness)) for c in color[:3]]
+        rgb = [int(self.adjust_brightness(c, self.brightness))
+               for c in color[:3]]
         self.pixels.fill(rgb)
         self.pixels.show()
 
