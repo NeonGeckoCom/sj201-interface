@@ -57,6 +57,10 @@ class MycroftFan:
         """returns temp in celsius"""
         return -1.0
 
+    @abc.abstractmethod
+    def shutdown(self):
+        """shutdown controls and set output to 0"""
+
     @staticmethod
     def execute_cmd(cmd):
         process = subprocess.Popen(cmd, stdout=subprocess.PIPE,
@@ -140,6 +144,9 @@ class R6FanControl(MycroftFan):
         out, err = self.execute_cmd(cmd)
         return float(out.strip()) / 1000
 
+    def shutdown(self):
+        self.set_fan_speed(0)
+
 
 class R10FanControl(MycroftFan):
     # hardware speed range is appx 30-255
@@ -151,12 +158,12 @@ class R10FanControl(MycroftFan):
 
     def __init__(self):
         self.fan_speed = 0
-        ledpin = 13  # PWM pin connected to Fan
+        self.fan_pin = 13  # PWM pin connected to Fan
         GPIO.setwarnings(False)  # disable warnings
         GPIO.setmode(GPIO.BCM)  # set pin numbering system
-        GPIO.setup(ledpin, GPIO.OUT)  # set direction
-        self.pi_pwm = GPIO.PWM(ledpin, 1000)  # create PWM instance with frequency
-        self.pi_pwm.start(0)  # start PWM of required Duty Cycle
+        GPIO.setup(self.fan_pin, GPIO.OUT)  # set direction
+        self.pi_pwm = GPIO.PWM(self.fan_pin, 1000)  # create PWM instance with frequency
+        self.pi_pwm.start(100)  # start PWM of required Duty Cycle
 
     @staticmethod
     def speed_to_hdw_val(speed):
@@ -182,6 +189,10 @@ class R10FanControl(MycroftFan):
         cmd = ["cat", "/sys/class/thermal/thermal_zone0/temp"]
         out, err = self.execute_cmd(cmd)
         return float(out.strip()) / 1000
+
+    def shutdown(self):
+        self.pi_pwm.stop()
+        GPIO.output(self.fan_pin, 1)
 
 
 class FanControlThread(Thread):
