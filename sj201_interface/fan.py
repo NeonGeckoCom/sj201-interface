@@ -192,6 +192,7 @@ class R10FanControl(MycroftFan):
 
     def shutdown(self):
         self.pi_pwm.stop()
+        sleep(1)
         GPIO.output(self.fan_pin, 1)
 
 
