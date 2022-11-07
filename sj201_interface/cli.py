@@ -74,5 +74,6 @@ def set_fan_speed(speed=100):
     if rev == SJ201.r10 and speed == 0:
         click.echo("Turning off R10 Fan")
         get_fan(rev).shutdown()
+        exit(0)
     get_fan(rev).set_fan_speed(speed)
     click.echo(f"Set fan speed to {speed}")
