@@ -69,6 +69,11 @@ def reset_led(color=None):
 def set_fan_speed(speed=100):
     speed = int(round(float(speed)))
     from sj201_interface.fan import get_fan
-    from sj201_interface.revisions import detect_sj201_revision
-    get_fan(detect_sj201_revision()).set_fan_speed(speed)
+    from sj201_interface.revisions import detect_sj201_revision, SJ201
+    rev = detect_sj201_revision()
+    if rev == SJ201.r10 and speed == 0:
+        click.echo("Turning off R10 Fan")
+        get_fan(rev).shutdown()
+        exit(0)
+    get_fan(rev).set_fan_speed(speed)
     click.echo(f"Set fan speed to {speed}")
