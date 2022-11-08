@@ -5,6 +5,9 @@ for reference.
 
 # CLI Usage
 
+## `sj201 get-revision`
+Get a string representation of the detected SJ201 board (`6` or `10`) or `0`
+
 ## `sj201 reset-led <color>`
 Chase the specified color and then chase off LED ring. Valid colors are:
 - white
@@ -30,4 +33,8 @@ Set the fan speed to the specified speed as a percentage.
 Perform boot time initialization of the TAS5806 Audio Amplifier
 
 ## `sj201 patch-config-txt`
-Perform one-time update of config.txt for detected SJ201 hardware
+Perform one-time update of config.txt for detected SJ201 hardware.
+>*NOTE*: Applying this could cause damage or unexpected behavior for connected
+> HATs/GPIO components.
+
+>*NOTE*: `reboot` will cause kernel panics unless power is physically disconnected

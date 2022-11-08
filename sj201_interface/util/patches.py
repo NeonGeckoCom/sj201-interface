@@ -34,7 +34,11 @@ def patch_r10_config_txt():
     shut down using the `gpio-poweroff` kernel mod. It will also default the
     fan pin (13) to a pull_up state on boot to turn off the fan.
 
-    Note that using this script changes default GPIO behavior and MAY CAUSE
+    Not that applying this patch means `reboot` commands will cause a kernel
+    panic; it is expected that some external component will cut power to the
+    RPi when the shutdown target is reached.
+
+    Note that applying this patch changes default GPIO behavior and MAY CAUSE
     DAMAGE to other GPIO accessories.
     """
     with open('/boot/firmware/config.txt', 'r+') as f:

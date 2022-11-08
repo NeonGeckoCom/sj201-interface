@@ -86,3 +86,12 @@ def patch_config_txt():
     if detect_sj201_revision() == SJ201.r10:
         click.echo("Patching config.txt for SJ201r10")
         patch_r10_config_txt()
+
+
+@sj201_cli.command(help="Get a string representation of the detected board")
+def get_revision():
+    from sj201_interface.revisions import detect_sj201_revision
+    version = detect_sj201_revision()
+    version = version.value if version else '0'
+    click.echo(version)
+    exit(version)

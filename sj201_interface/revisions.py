@@ -32,8 +32,8 @@ from typing import Optional
 
 
 class SJ201(Enum):
-    r6 = "dev"
-    r10 = "prod"
+    r6 = "6"
+    r10 = "10"
 
 
 def detect_sj201_revision() -> Optional[SJ201]:
