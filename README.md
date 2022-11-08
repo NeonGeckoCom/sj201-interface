@@ -26,5 +26,8 @@ Set the fan speed to the specified speed as a percentage.
 > Setting speed to 0 will turn off the fan until the Raspberry Pi is shut down,
 > at which point the fan will resume 100%.
 
-## `init-ti-amp`
-Perform one-time initialization of the TAS5806 Audio Amplifier
+## `sj201 init-ti-amp`
+Perform boot time initialization of the TAS5806 Audio Amplifier
+
+## `sj201 patch-config-txt`
+Perform one-time update of config.txt for detected SJ201 hardware

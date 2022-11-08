@@ -77,3 +77,12 @@ def set_fan_speed(speed=100):
         exit(0)
     get_fan(rev).set_fan_speed(speed)
     click.echo(f"Set fan speed to {speed}")
+
+
+@sj201_cli.command(help="Patch config.txt for SJ201R10")
+def patch_config_txt():
+    from sj201_interface.revisions import detect_sj201_revision, SJ201
+    from sj201_interface.util.patches import patch_r10_config_txt
+    if detect_sj201_revision() == SJ201.r10:
+        click.echo("Patching config.txt for SJ201r10")
+        patch_r10_config_txt()
