@@ -303,7 +303,6 @@ class R10Led(MycroftLed):
         )
         if immediate:
             self.pixels.show()
-        LOG.debug(f"set {pixel} to {color}")
 
     def get_led(self, which_led):
         pass
