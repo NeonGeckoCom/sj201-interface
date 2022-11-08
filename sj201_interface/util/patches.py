@@ -37,7 +37,7 @@ def patch_r10_config_txt():
     Note that using this script changes default GPIO behavior and MAY CAUSE
     DAMAGE to other GPIO accessories.
     """
-    with open('/boot/firmware/config.txt', 'rw') as f:
+    with open('/boot/firmware/config.txt', 'r+') as f:
         if any((line for line in f.readlines() if "# SJ201R10" in line)):
             return
         f.write("\n# SJ201R10-Specifics\n"
