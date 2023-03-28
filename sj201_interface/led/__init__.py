@@ -43,9 +43,9 @@
 import abc
 from typing import Union
 
-import board
 import neopixel
 
+from adafruit_blinka.microcontroller.bcm283x.pin import D12
 from enum import Enum
 from time import sleep
 from threading import Thread, Event
@@ -254,7 +254,7 @@ class R10Led(MycroftLed):
         # order = neopixel.GRB
         self.brightness = 0.2
         self.pixels = neopixel.NeoPixel(
-            board.D12,
+            D12,
             self.real_num_leds,
             brightness=self.brightness,
             auto_write=False,
