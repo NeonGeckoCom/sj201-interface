@@ -53,7 +53,8 @@ from queue import Queue
 from ovos_utils.log import LOG
 from smbus2.smbus2 import SMBus, I2C_SMBUS_BLOCK_MAX
 
-from sj201_interface.revisions import SJ201, detect_sj201_revision
+from sj201_interface.revisions import SJ201, detect_sj201_revision, sj201_rev10_pwm_fan_overlay_present
+from sj201_interface.util.pwmcontroller import PWMController
 
 
 class Palette(Enum):
@@ -319,6 +320,58 @@ class R10Led(MycroftLed):
         for x in range(0, self.num_leds):
             self.set_led(x, new_leds[x])
 
+class HwPwmAwareLed(MycroftLed):
+    def __init__(self, led: MycroftLed):
+        import atexit
+        self.led = led
+        self.pwm = PWMController()
+        self.original_pwm_clck_div = self.pwm.pwm_clk_div.value >> 12
+        self.original_pwm_control = self.pwm.pwm_control.value
+        self.original_pwm1_range = self.pwm.pwm1_range.value
+        # Set the shared PWM Clock Divisor for both PWM channels to the expected value by `rpi_ws281x`
+        self.pwm.pwm_set_clock(8)
+        atexit.register(self.restore_original_registers)
+
+    @property
+    def num_leds(self):
+        return self.led.num_leds
+    
+    def _prep_pwm_clock(self):
+        """Configures PWM1 channel range to expected value for the `rpi_ws281x` library used by AdaFruit Blinka Neopixel"""
+        self.pwm.configure_pwm1(32)
+    
+    def set_led(self, which_led, color, immediate=True):   
+        self._prep_pwm_clock() 
+        return self.led.set_led(which_led, color, immediate)
+
+    def fill(self, color):
+        self._prep_pwm_clock() 
+        return self.led.fill(color)
+
+    def show(self):
+        self._prep_pwm_clock() 
+        return self.led.show()
+
+    def get_led(self, which_led):
+        self._prep_pwm_clock() 
+        return self.led.get_led(which_led)
+
+    def set_leds(self, leds):
+        self._prep_pwm_clock() 
+        return self.led.set_leds(leds)
+
+    def get_capabilities(self):
+        return self.led.get_capabilities()
+    
+    def __exit__(self, exc_type, exc_value, traceback):
+        self.pwm.close()
+
+    def restore_original_registers(self):        
+        with PWMController() as pwm:
+            pwm.pwm_control.value = self.original_pwm_control
+            pwm.pwm_set_clock(self.original_pwm_clck_div)
+            pwm.configure_pwm1(self.original_pwm1_range)
+    
 
 class LedThread(Thread):
     def __init__(self, led_obj, animations=None):
@@ -383,8 +436,8 @@ def get_led(revision: SJ201) -> MycroftLed:
     :param revision: SJ201 Board Revision
     :returns: MycroftLed Object
     """
-    if revision == SJ201.r10:
-        return R10Led()
+    if revision == SJ201.r10:  
+        return HwPwmAwareLed(R10Led()) if sj201_rev10_pwm_fan_overlay_present() else R10Led()
     elif revision == SJ201.r6:
         return R6Led()
     else:
