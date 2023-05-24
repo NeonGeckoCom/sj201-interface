@@ -436,7 +436,7 @@ def get_led(revision: SJ201) -> MycroftLed:
     :param revision: SJ201 Board Revision
     :returns: MycroftLed Object
     """
-    if revision == SJ201.r10:  
+    if revision == SJ201.r10:
         return HwPwmAwareLed(R10Led()) if sj201_rev10_pwm_fan_overlay_present() else R10Led()
     elif revision == SJ201.r6:
         return R6Led()

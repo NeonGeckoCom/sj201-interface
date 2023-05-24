@@ -31,15 +31,15 @@ class PWMController:
     BLOCK_SIZE = 4*1024
     PWM0_RANGE = 4
     PWM1_RANGE = 8
-    PWM_CONTROL         = 0
-    PWM_STATUS          = 1
-    PWM0_RANGE          = 4
-    PWM1_RANGE          = 8
-    PWMCLK_CNTL         = 40
-    PWMCLK_DIV          = 41
-    BCM_PASSWORD        = 0x5A000000
-    TIMER_CONTROL       = (0x408 >> 2)
-    TIMER_PRE_DIV       = (0x41C >> 2)
+    PWM_CONTROL = 0
+    PWM_STATUS = 1
+    PWM0_RANGE = 4
+    PWM1_RANGE = 8
+    PWMCLK_CNTL = 40
+    PWMCLK_DIV = 41
+    BCM_PASSWORD = 0x5A000000
+    TIMER_CONTROL = (0x408 >> 2)
+    TIMER_PRE_DIV = (0x41C >> 2)
 
     PWM0_ENABLE = 0x0001
     PWM1_ENABLE = 0x0100
@@ -135,10 +135,3 @@ class PWMController:
         del self.pwm_clk_cntl
         del self._clk_mv
         self._clk.close()
-
-if __name__ == "__main__":
-    pwm_controller = PWMController()
-    pwm_controller.set_mode("ms")
-    pwm_controller.configure_pwm1(32)
-    pwm_controller.pwm_set_clock(8)
-    pwm_controller.close()
