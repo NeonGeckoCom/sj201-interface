@@ -32,7 +32,8 @@ from os import path, getenv
 BASE_PATH = path.abspath(path.dirname(__file__))
 
 
-with open(path.join(BASE_PATH, "version.py"), "r", encoding="utf-8") as v:
+with open(path.join(BASE_PATH, "sj201_interface",
+                    "version.py"), "r", encoding="utf-8") as v:
     for line in v.readlines():
         if line.startswith("__version__"):
             if '"' in line:
