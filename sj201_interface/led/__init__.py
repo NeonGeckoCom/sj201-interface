@@ -453,7 +453,7 @@ def chase(led: MycroftLed = None, color: Palette = Palette.WHITE):
     led = led or get_led(detect_sj201_revision())
     for i in range(led.num_leds):
         led.set_led(i, color.value)
-        sleep(0.02)
+        Event().wait(0.02)
 
 
 def reset_led_animation(color: Palette = Palette.WHITE):
@@ -463,5 +463,5 @@ def reset_led_animation(color: Palette = Palette.WHITE):
     """
     led_object = get_led(detect_sj201_revision())
     chase(led_object, color)
-    sleep(1)
+    Event().wait(1)
     chase(led_object, Palette.BLACK)
