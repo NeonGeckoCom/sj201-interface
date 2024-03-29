@@ -1,8 +1,8 @@
 # Changelog
 
-## [Unreleased](https://github.com/NeonGeckoCom/sj201-interface/tree/HEAD)
+## [0.0.3a4](https://github.com/NeonGeckoCom/sj201-interface/tree/0.0.3a4) (2024-03-29)
 
-[Full Changelog](https://github.com/NeonGeckoCom/sj201-interface/compare/0.0.2...HEAD)
+[Full Changelog](https://github.com/NeonGeckoCom/sj201-interface/compare/0.0.2...0.0.3a4)
 
 **Fixed bugs:**
 
@@ -10,6 +10,7 @@
 
 **Merged pull requests:**
 
+- Fix relative path references in setup.py [\#25](https://github.com/NeonGeckoCom/sj201-interface/pull/25) ([NeonDaniel](https://github.com/NeonDaniel))
 - Update GitHub automation [\#24](https://github.com/NeonGeckoCom/sj201-interface/pull/24) ([NeonDaniel](https://github.com/NeonDaniel))
 - Loosen ovos-utils dependency spec [\#22](https://github.com/NeonGeckoCom/sj201-interface/pull/22) ([NeonDaniel](https://github.com/NeonDaniel))
 - HardwarePWM-aware led driver [\#19](https://github.com/NeonGeckoCom/sj201-interface/pull/19) ([NeonDaniel](https://github.com/NeonDaniel))
