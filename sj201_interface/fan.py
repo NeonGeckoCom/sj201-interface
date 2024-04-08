@@ -189,7 +189,7 @@ class R10FanControl(MycroftFan):
         return float(out.strip()) / 1000
 
     def shutdown(self):
-        self.pi_pwm.on()
+        self.pi_pwm.off()
         self.pi_pwm = None
 
 
