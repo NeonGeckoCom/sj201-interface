@@ -158,10 +158,17 @@ class R10FanControl(MycroftFan):
     def __init__(self):
         self.fan_speed = 0
         self.fan_pin = 13  # PWM pin connected to Fan
-        self.pi_pwm = gpiozero.PWMOutputDevice(self.fan_pin, frequency=1000,
-                                               initial_value=1,
-                                               pin_factory=LGPIOFactory())
+        self._pi_pwm = None
         self._waiter = Event()
+
+    @property
+    def pi_pwm(self):
+        if not self._pi_pwm:
+            self._pi_pwm = gpiozero.PWMOutputDevice(self.fan_pin,
+                                                    frequency=1000,
+                                                    initial_value=1,
+                                                    pin_factory=LGPIOFactory())
+        return self._pi_pwm
 
     @staticmethod
     def speed_to_hdw_val(speed):
@@ -189,9 +196,9 @@ class R10FanControl(MycroftFan):
         return float(out.strip()) / 1000
 
     def shutdown(self):
-        self.pi_pwm = None
         gpiozero.OutputDevice(pin=self.fan_pin, initial_value=False,
-                              pin_factory=LGPIOFactory())
+                              active_high=False, pin_factory=LGPIOFactory())
+        self._waiter.wait(1)  # Block while fan ramps up/down
 
 
 class FanControlThread(Thread):
