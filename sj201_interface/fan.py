@@ -189,8 +189,8 @@ class R10FanControl(MycroftFan):
         return float(out.strip()) / 1000
 
     def shutdown(self):
-        self.hdw_set_speed(0)
         self.pi_pwm.off()
+        self._waiter.wait(1)  # Block while fan ramps down
         self.pi_pwm = None
 
 
