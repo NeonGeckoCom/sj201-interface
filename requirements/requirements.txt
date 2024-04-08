@@ -7,3 +7,4 @@ rpi_ws281x~=4.3
 adafruit-circuitpython-neopixel~=6.3
 adafruit-blinka~=8.6
 spidev~=3.5
+lgpio~=0.2.2

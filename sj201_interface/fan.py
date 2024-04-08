@@ -29,6 +29,7 @@
 import abc
 import subprocess
 import gpiozero
+from gpiozero.pins.lgpio import LGPIOFactory
 from threading import Thread, Event
 from ovos_utils.log import LOG
 from sj201_interface.revisions import SJ201, detect_sj201_revision
@@ -158,7 +159,8 @@ class R10FanControl(MycroftFan):
         self.fan_speed = 0
         self.fan_pin = 13  # PWM pin connected to Fan
         self.pi_pwm = gpiozero.PWMOutputDevice(self.fan_pin, frequency=1000,
-                                               initial_value=1)
+                                               initial_value=1,
+                                               pin_factory=LGPIOFactory())
         self._waiter = Event()
 
     @staticmethod
