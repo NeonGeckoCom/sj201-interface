@@ -197,7 +197,7 @@ class R10FanControl(MycroftFan):
 
     def shutdown(self):
         gpiozero.OutputDevice(pin=self.fan_pin, initial_value=False,
-                              active_high=False)
+                              active_high=True)
         self._waiter.wait(1)  # Block while fan ramps up/down
 
 
