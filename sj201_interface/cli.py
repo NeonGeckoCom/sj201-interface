@@ -94,4 +94,4 @@ def get_revision():
     version = detect_sj201_revision()
     version = version.value if version else '0'
     click.echo(version)
-    exit(version)
+    # exit(version)

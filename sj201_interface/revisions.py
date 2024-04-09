@@ -45,7 +45,8 @@ def detect_sj201_revision() -> Optional[SJ201]:
     xmos_address = "2c"
     ti_address = "2f"
 
-    i2c_addresses = Popen("i2cdetect -a -y 1", stdout=PIPE, stderr=None, shell=True).communicate()[0].decode("ascii")
+    i2c_addresses = Popen("i2cdetect -a -y 1", stdout=PIPE, stderr=None,
+                          shell=True).communicate()[0].decode("ascii")
 
     tiny_is_present = tiny_address in i2c_addresses
     xmos_is_present = xmos_address in i2c_addresses
@@ -57,6 +58,7 @@ def detect_sj201_revision() -> Optional[SJ201]:
         else:
             return SJ201.r10
     return None
+
 
 def sj201_rev10_pwm_fan_overlay_present() -> bool:
     return os.path.exists('/sys/firmware/devicetree/base/sj201-rev10-pwm-fan@0')
