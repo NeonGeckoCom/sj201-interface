@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.0.3a5](https://github.com/NeonGeckoCom/sj201-interface/tree/0.0.3a5) (2025-03-14)
+
+[Full Changelog](https://github.com/NeonGeckoCom/sj201-interface/compare/0.0.3a4...0.0.3a5)
+
+**Merged pull requests:**
+
+- Update license notices to 2025 [\#27](https://github.com/NeonGeckoCom/sj201-interface/pull/27) ([NeonDaniel](https://github.com/NeonDaniel))
+
 ## [0.0.3a4](https://github.com/NeonGeckoCom/sj201-interface/tree/0.0.3a4) (2024-03-29)
 
 [Full Changelog](https://github.com/NeonGeckoCom/sj201-interface/compare/0.0.2...0.0.3a4)
