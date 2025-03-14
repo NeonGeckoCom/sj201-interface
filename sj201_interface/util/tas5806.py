@@ -43,7 +43,7 @@ import os
 import time
 from math import log, exp
 from smbus2 import SMBus
-from ovos_utils.log import LOG
+from sj201_interface.log import LOG
 
 
 class Tas5806:
