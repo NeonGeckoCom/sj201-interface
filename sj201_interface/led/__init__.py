@@ -50,9 +50,9 @@ from enum import Enum
 from time import sleep
 from threading import Thread, Event
 from queue import Queue
-from ovos_utils.log import LOG
 from smbus2.smbus2 import SMBus, I2C_SMBUS_BLOCK_MAX
 
+from sj201_interface.log import LOG
 from sj201_interface.revisions import SJ201, detect_sj201_revision, sj201_rev10_pwm_fan_overlay_present
 from sj201_interface.util.pwmcontroller import PWMController
 

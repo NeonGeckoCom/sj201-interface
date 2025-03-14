@@ -32,7 +32,7 @@ import RPi.GPIO as GPIO
 
 from time import sleep
 from threading import Thread, Event
-from ovos_utils.log import LOG
+from sj201_interface.log import LOG
 from sj201_interface.revisions import SJ201, detect_sj201_revision
 
 
