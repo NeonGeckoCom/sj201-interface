@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.0.3a6](https://github.com/NeonGeckoCom/sj201-interface/tree/0.0.3a6) (2025-03-14)
+
+[Full Changelog](https://github.com/NeonGeckoCom/sj201-interface/compare/0.0.3a5...0.0.3a6)
+
+**Implemented enhancements:**
+
+- \[FEAT\] drop ovos-utils dependency [\#26](https://github.com/NeonGeckoCom/sj201-interface/issues/26)
+
+**Merged pull requests:**
+
+- Remove ovos-utils dependency [\#28](https://github.com/NeonGeckoCom/sj201-interface/pull/28) ([NeonDaniel](https://github.com/NeonDaniel))
+
 ## [0.0.3a5](https://github.com/NeonGeckoCom/sj201-interface/tree/0.0.3a5) (2025-03-14)
 
 [Full Changelog](https://github.com/NeonGeckoCom/sj201-interface/compare/0.0.3a4...0.0.3a5)
@@ -23,6 +35,26 @@
 - Loosen ovos-utils dependency spec [\#22](https://github.com/NeonGeckoCom/sj201-interface/pull/22) ([NeonDaniel](https://github.com/NeonDaniel))
 - HardwarePWM-aware led driver [\#19](https://github.com/NeonGeckoCom/sj201-interface/pull/19) ([NeonDaniel](https://github.com/NeonDaniel))
 - Remove extra `board` dependency [\#17](https://github.com/NeonGeckoCom/sj201-interface/pull/17) ([NeonDaniel](https://github.com/NeonDaniel))
+
+## [0.0.2](https://github.com/NeonGeckoCom/sj201-interface/tree/0.0.2) (2022-11-09)
+
+[Full Changelog](https://github.com/NeonGeckoCom/sj201-interface/compare/32a6fb21db5ae1d618234c92fd54196e8f27c74d...0.0.2)
+
+**Merged pull requests:**
+
+- Increment version to 0.0.2 [\#16](https://github.com/NeonGeckoCom/sj201-interface/pull/16) ([NeonDaniel](https://github.com/NeonDaniel))
+- Add method to return SJ201 revision [\#15](https://github.com/NeonGeckoCom/sj201-interface/pull/15) ([NeonDaniel](https://github.com/NeonDaniel))
+- Patching SJ201R10 Shutdown Behavior [\#14](https://github.com/NeonGeckoCom/sj201-interface/pull/14) ([NeonDaniel](https://github.com/NeonDaniel))
+- Prevent version bump on version change PRs [\#13](https://github.com/NeonGeckoCom/sj201-interface/pull/13) ([NeonDaniel](https://github.com/NeonDaniel))
+- Increment version to 0.0.1 [\#12](https://github.com/NeonGeckoCom/sj201-interface/pull/12) ([NeonDaniel](https://github.com/NeonDaniel))
+- Remove second debug log in `set_led` [\#11](https://github.com/NeonGeckoCom/sj201-interface/pull/11) ([NeonDaniel](https://github.com/NeonDaniel))
+- Add R10 fan power off support [\#10](https://github.com/NeonGeckoCom/sj201-interface/pull/10) ([NeonDaniel](https://github.com/NeonDaniel))
+- Spec `tuple` as the only valid data type for `fill` command [\#9](https://github.com/NeonGeckoCom/sj201-interface/pull/9) ([NeonDaniel](https://github.com/NeonDaniel))
+- Drop smbus dependency [\#7](https://github.com/NeonGeckoCom/sj201-interface/pull/7) ([NeonDaniel](https://github.com/NeonDaniel))
+- Add in missing dependencies [\#5](https://github.com/NeonGeckoCom/sj201-interface/pull/5) ([NeonDaniel](https://github.com/NeonDaniel))
+- Fix Base sj201 r10 Support [\#4](https://github.com/NeonGeckoCom/sj201-interface/pull/4) ([NeonDaniel](https://github.com/NeonDaniel))
+- Fix typo in version\_bump.py file [\#3](https://github.com/NeonGeckoCom/sj201-interface/pull/3) ([NeonDaniel](https://github.com/NeonDaniel))
+- Initial Implementation of SJ201 R4 and \(untested\) R10 [\#1](https://github.com/NeonGeckoCom/sj201-interface/pull/1) ([NeonDaniel](https://github.com/NeonDaniel))
 
 
 
