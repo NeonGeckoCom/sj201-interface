@@ -1,6 +1,6 @@
 # NEON AI (TM) SOFTWARE, Software Development Kit & Application Framework
 # All trademark and other rights reserved by their respective owners
-# Copyright 2008-2022 Neongecko.com Inc.
+# Copyright 2008-2025 Neongecko.com Inc.
 # Contributors: Daniel McKnight, Guy Daniels, Elon Gasper, Richard Leeds,
 # Regina Bloomstine, Casimiro Ferreira, Andrii Pernatii, Kirill Hrymailo
 # BSD-3 License
@@ -29,6 +29,7 @@
 from enum import Enum
 from subprocess import Popen, PIPE
 from typing import Optional
+import os
 
 
 class SJ201(Enum):
@@ -43,17 +44,12 @@ def detect_sj201_revision() -> Optional[SJ201]:
     tiny_address = "04"
     xmos_address = "2c"
     ti_address = "2f"
-    cmd = "i2cdetect -a -y 1 | grep %s" % (tiny_address,)
-    process = Popen(cmd, stdout=PIPE, stderr=None, shell=True)
-    tiny_is_present = True if process.communicate()[0] else False
 
-    cmd = "i2cdetect -a -y 1 | grep %s" % (xmos_address,)
-    process = Popen(cmd, stdout=PIPE, stderr=None, shell=True)
-    xmos_is_present = True if process.communicate()[0] else False
+    i2c_addresses = Popen("i2cdetect -a -y 1", stdout=PIPE, stderr=None, shell=True).communicate()[0].decode("ascii")
 
-    cmd = "i2cdetect -a -y 1 | grep %s" % (ti_address,)
-    process = Popen(cmd, stdout=PIPE, stderr=None, shell=True)
-    ti_is_present = True if process.communicate()[0] else False
+    tiny_is_present = tiny_address in i2c_addresses
+    xmos_is_present = xmos_address in i2c_addresses
+    ti_is_present = ti_address in i2c_addresses
 
     if ti_is_present and xmos_is_present:
         if tiny_is_present:
@@ -61,3 +57,6 @@ def detect_sj201_revision() -> Optional[SJ201]:
         else:
             return SJ201.r10
     return None
+
+def sj201_rev10_pwm_fan_overlay_present() -> bool:
+    return os.path.exists('/sys/firmware/devicetree/base/sj201-rev10-pwm-fan@0')

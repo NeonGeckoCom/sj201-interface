@@ -1,6 +1,6 @@
 # NEON AI (TM) SOFTWARE, Software Development Kit & Application Framework
 # All trademark and other rights reserved by their respective owners
-# Copyright 2008-2022 Neongecko.com Inc.
+# Copyright 2008-2025 Neongecko.com Inc.
 # Contributors: Daniel McKnight, Guy Daniels, Elon Gasper, Richard Leeds,
 # Regina Bloomstine, Casimiro Ferreira, Andrii Pernatii, Kirill Hrymailo
 # BSD-3 License
@@ -26,29 +26,15 @@
 # NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE,  EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-import fileinput
-from os.path import join, dirname
+import logging
 
-with open(join(dirname(__file__), "sj201_interface", "version.py"), "r", encoding="utf-8") as v:
-    for line in v.readlines():
-        if line.startswith("__version__"):
-            if '"' in line:
-                version = line.split('"')[1]
-            else:
-                version = line.split("'")[1]
+LOG = logging.getLogger("sj201_interface")
+LOG.setLevel(logging.DEBUG)
 
-if "a" not in version:
-    parts = version.split('.')
-    parts[-1] = str(int(parts[-1]) + 1)
-    version = '.'.join(parts)
-    version = f"{version}a0"
-else:
-    post = version.split("a")[1]
-    new_post = int(post) + 1
-    version = version.replace(f"a{post}", f"a{new_post}")
+console_handler = logging.StreamHandler()
+console_handler.setLevel(logging.DEBUG)
 
-for line in fileinput.input(join(dirname(__file__), "sj201_interface", "version.py"), inplace=True):
-    if line.startswith("__version__"):
-        print(f"__version__ = \"{version}\"")
-    else:
-        print(line.rstrip('\n'))
+formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+console_handler.setFormatter(formatter)
+
+LOG.addHandler(console_handler)
